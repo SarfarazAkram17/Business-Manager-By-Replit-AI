@@ -35,8 +35,6 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 const isProduction = process.env.NODE_ENV === "production";
-const isReplit = !!process.env.REPLIT_DEV_DOMAIN;
-const useSecureCookies = isProduction || isReplit;
 
 const PgStore = connectPgSimple(session);
 
@@ -50,9 +48,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: useSecureCookies,
+      secure: isProduction,
       httpOnly: true,
-      sameSite: useSecureCookies ? "none" : "lax",
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     },
   }),
