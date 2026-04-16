@@ -1,0 +1,980 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Business Manager API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: sales
+    description: Sales operations
+  - name: expenses
+    description: Expenses operations
+  - name: inventory
+    description: Inventory operations
+  - name: settings
+    description: Settings operations
+  - name: dashboard
+    description: Dashboard operations
+  - name: reports
+    description: Report operations
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout user
+      responses:
+        "200":
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sales:
+    get:
+      operationId: getSales
+      tags: [sales]
+      summary: Get all sales
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: endDate
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: month
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: year
+          in: query
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: List of sales
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sale"
+    post:
+      operationId: createSale
+      tags: [sales]
+      summary: Create a new sale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSaleBody"
+      responses:
+        "201":
+          description: Sale created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sale"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sales/{id}:
+    get:
+      operationId: getSale
+      tags: [sales]
+      summary: Get a sale by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Sale found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sale"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateSale
+      tags: [sales]
+      summary: Update a sale
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSaleBody"
+      responses:
+        "200":
+          description: Sale updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sale"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteSale
+      tags: [sales]
+      summary: Delete a sale
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /expenses:
+    get:
+      operationId: getExpenses
+      tags: [expenses]
+      summary: Get all expenses
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: endDate
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: month
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: year
+          in: query
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: List of expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Expense"
+    post:
+      operationId: createExpense
+      tags: [expenses]
+      summary: Create a new expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateExpenseBody"
+      responses:
+        "201":
+          description: Expense created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /expenses/{id}:
+    patch:
+      operationId: updateExpense
+      tags: [expenses]
+      summary: Update an expense
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateExpenseBody"
+      responses:
+        "200":
+          description: Expense updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteExpense
+      tags: [expenses]
+      summary: Delete an expense
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /inventory:
+    get:
+      operationId: getInventory
+      tags: [inventory]
+      summary: Get all inventory items
+      responses:
+        "200":
+          description: List of inventory items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InventoryItem"
+    post:
+      operationId: createInventoryItem
+      tags: [inventory]
+      summary: Create a new inventory item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateInventoryItemBody"
+      responses:
+        "201":
+          description: Item created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryItem"
+
+  /inventory/{id}:
+    patch:
+      operationId: updateInventoryItem
+      tags: [inventory]
+      summary: Update an inventory item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateInventoryItemBody"
+      responses:
+        "200":
+          description: Item updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryItem"
+    delete:
+      operationId: deleteInventoryItem
+      tags: [inventory]
+      summary: Delete an inventory item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get user settings
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSettings"
+    patch:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update user settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSettingsBody"
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSettings"
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard statistics
+      parameters:
+        - name: period
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [today, week, month, year]
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/chart:
+    get:
+      operationId: getDashboardChart
+      tags: [dashboard]
+      summary: Get revenue and profit chart data
+      parameters:
+        - name: period
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [today, week, month, year]
+      responses:
+        "200":
+          description: Chart data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChartDataPoint"
+
+  /dashboard/recent-sales:
+    get:
+      operationId: getRecentSales
+      tags: [dashboard]
+      summary: Get recent 5 sales
+      responses:
+        "200":
+          description: Recent sales
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sale"
+
+  /reports/monthly:
+    get:
+      operationId: getMonthlyReport
+      tags: [reports]
+      summary: Get monthly report
+      parameters:
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Monthly report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonthlyReport"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    RegisterBody:
+      type: object
+      properties:
+        businessName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - businessName
+        - email
+        - password
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        businessName:
+          type: string
+        email:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - businessName
+        - email
+        - createdAt
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - user
+
+    Sale:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        productName:
+          type: string
+        quantity:
+          type: integer
+        buyPrice:
+          type: number
+        sellPrice:
+          type: number
+        profit:
+          type: number
+        notes:
+          type: ["string", "null"]
+        images:
+          type: array
+          items:
+            type: string
+        inventoryItemId:
+          type: ["integer", "null"]
+        saleDate:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - userId
+        - productName
+        - quantity
+        - buyPrice
+        - sellPrice
+        - profit
+        - images
+        - saleDate
+        - createdAt
+        - updatedAt
+
+    CreateSaleBody:
+      type: object
+      properties:
+        productName:
+          type: string
+        quantity:
+          type: integer
+        buyPrice:
+          type: number
+        sellPrice:
+          type: number
+        notes:
+          type: ["string", "null"]
+        images:
+          type: array
+          items:
+            type: string
+        inventoryItemId:
+          type: ["integer", "null"]
+        saleDate:
+          type: string
+      required:
+        - productName
+        - quantity
+        - buyPrice
+        - sellPrice
+        - saleDate
+
+    UpdateSaleBody:
+      type: object
+      properties:
+        productName:
+          type: string
+        quantity:
+          type: integer
+        buyPrice:
+          type: number
+        sellPrice:
+          type: number
+        notes:
+          type: ["string", "null"]
+        images:
+          type: array
+          items:
+            type: string
+        inventoryItemId:
+          type: ["integer", "null"]
+        saleDate:
+          type: string
+
+    Expense:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        title:
+          type: string
+        amount:
+          type: number
+        category:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        expenseDate:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - userId
+        - title
+        - amount
+        - expenseDate
+        - createdAt
+        - updatedAt
+
+    CreateExpenseBody:
+      type: object
+      properties:
+        title:
+          type: string
+        amount:
+          type: number
+        category:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        expenseDate:
+          type: string
+      required:
+        - title
+        - amount
+        - expenseDate
+
+    UpdateExpenseBody:
+      type: object
+      properties:
+        title:
+          type: string
+        amount:
+          type: number
+        category:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        expenseDate:
+          type: string
+
+    InventoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        name:
+          type: string
+        quantity:
+          type: integer
+        buyPrice:
+          type: number
+        sellPrice:
+          type: number
+        description:
+          type: ["string", "null"]
+        images:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - userId
+        - name
+        - quantity
+        - buyPrice
+        - sellPrice
+        - images
+        - createdAt
+        - updatedAt
+
+    CreateInventoryItemBody:
+      type: object
+      properties:
+        name:
+          type: string
+        quantity:
+          type: integer
+        buyPrice:
+          type: number
+        sellPrice:
+          type: number
+        description:
+          type: ["string", "null"]
+        images:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - quantity
+        - buyPrice
+        - sellPrice
+
+    UpdateInventoryItemBody:
+      type: object
+      properties:
+        name:
+          type: string
+        quantity:
+          type: integer
+        buyPrice:
+          type: number
+        sellPrice:
+          type: number
+        description:
+          type: ["string", "null"]
+        images:
+          type: array
+          items:
+            type: string
+
+    UserSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        businessName:
+          type: string
+        theme:
+          type: string
+        currency:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - userId
+        - businessName
+        - theme
+        - currency
+        - createdAt
+        - updatedAt
+
+    UpdateSettingsBody:
+      type: object
+      properties:
+        businessName:
+          type: string
+        theme:
+          type: string
+        currency:
+          type: string
+
+    DashboardStats:
+      type: object
+      properties:
+        totalRevenue:
+          type: number
+        totalProfit:
+          type: number
+        totalExpenses:
+          type: number
+        netProfit:
+          type: number
+        totalSales:
+          type: integer
+        totalItems:
+          type: integer
+      required:
+        - totalRevenue
+        - totalProfit
+        - totalExpenses
+        - netProfit
+        - totalSales
+        - totalItems
+
+    ChartDataPoint:
+      type: object
+      properties:
+        label:
+          type: string
+        revenue:
+          type: number
+        profit:
+          type: number
+      required:
+        - label
+        - revenue
+        - profit
+
+    TopProduct:
+      type: object
+      properties:
+        name:
+          type: string
+        totalQuantity:
+          type: integer
+        totalRevenue:
+          type: number
+        totalProfit:
+          type: number
+      required:
+        - name
+        - totalQuantity
+        - totalRevenue
+        - totalProfit
+
+    MonthlyReport:
+      type: object
+      properties:
+        month:
+          type: integer
+        year:
+          type: integer
+        totalRevenue:
+          type: number
+        totalProfit:
+          type: number
+        totalExpenses:
+          type: number
+        netProfit:
+          type: number
+        totalSales:
+          type: integer
+        chartData:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChartDataPoint"
+        topProducts:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopProduct"
+        sales:
+          type: array
+          items:
+            $ref: "#/components/schemas/Sale"
+        expenses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Expense"
+      required:
+        - month
+        - year
+        - totalRevenue
+        - totalProfit
+        - totalExpenses
+        - netProfit
+        - totalSales
+        - chartData
+        - topProducts
+        - sales
+        - expenses
