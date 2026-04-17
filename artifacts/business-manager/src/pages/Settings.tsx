@@ -201,7 +201,7 @@ export default function Settings() {
       return {
         startDate,
         endDate,
-        label: `Week: ${formatDate(startDate)} to ${formatDate(endDate)}`,
+        label: `Week: ${formatDate(startDate)} — ${formatDate(endDate)}`,
       };
     }
     if (pdfPeriod === "month") {
