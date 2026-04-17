@@ -201,7 +201,7 @@ export default function Settings() {
       return {
         startDate,
         endDate,
-        label: `Week: ${formatDate(startDate)} — ${formatDate(endDate)}`,
+        label: `Week: ${formatDate(startDate)} - ${formatDate(endDate)}`,
       };
     }
     if (pdfPeriod === "month") {
@@ -225,7 +225,7 @@ export default function Settings() {
     setIsGenerating(true);
     try {
       const { startDate, endDate, label } = getDateRange();
-      console.log(label)
+      console.log(label);
       const [salesRes, expensesRes, inventoryRes] = await Promise.all([
         fetch(`/api/sales?startDate=${startDate}&endDate=${endDate}`, {
           credentials: "include",
@@ -594,7 +594,7 @@ export default function Settings() {
               <p className="text-xs text-muted-foreground">
                 Week:{" "}
                 <span className="text-foreground font-medium">
-                  {formatDate(weekRange.startDate)} →{" "}
+                  {formatDate(weekRange.startDate)} -{" "}
                   {formatDate(weekRange.endDate)}
                 </span>
               </p>
