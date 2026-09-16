@@ -26,7 +26,11 @@ const queryClient = new QueryClient({
 
 function AuthenticatedRoutes() {
   const { user, isLoading } = useAuth();
-  if (isLoading) return null;
+    if (isLoading) return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+    </div>
+  );
   if (!user) return <Redirect to="/login" />;
   return (
     <Layout>
@@ -46,7 +50,11 @@ function AuthenticatedRoutes() {
 
 function PublicRoute({ component: Component }: { component: React.ComponentType }) {
   const { user, isLoading } = useAuth();
-  if (isLoading) return null;
+  if (isLoading) return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+    </div>
+  );
   if (user) return <Redirect to="/" />;
   return <Component />;
 }
