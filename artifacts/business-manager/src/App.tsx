@@ -26,11 +26,13 @@ const queryClient = new QueryClient({
 
 function AuthenticatedRoutes() {
   const { user, isLoading } = useAuth();
-    if (isLoading) return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="min-h-screen bg-background flex flex-col gap-3 items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+        <p className="text-sm animate-pulse text-gray-100">Loading</p>
+      </div>
+    );
   if (!user) return <Redirect to="/login" />;
   return (
     <Layout>
@@ -48,13 +50,19 @@ function AuthenticatedRoutes() {
   );
 }
 
-function PublicRoute({ component: Component }: { component: React.ComponentType }) {
+function PublicRoute({
+  component: Component,
+}: {
+  component: React.ComponentType;
+}) {
   const { user, isLoading } = useAuth();
-  if (isLoading) return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="min-h-screen bg-background flex flex-col gap-3 items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+        <p className="text-sm animate-pulse text-gray-100">Loading</p>
+      </div>
+    );
   if (user) return <Redirect to="/" />;
   return <Component />;
 }
@@ -62,8 +70,14 @@ function PublicRoute({ component: Component }: { component: React.ComponentType 
 function Router() {
   return (
     <Switch>
-      <Route path="/login" component={() => <PublicRoute component={Login} />} />
-      <Route path="/register" component={() => <PublicRoute component={Register} />} />
+      <Route
+        path="/login"
+        component={() => <PublicRoute component={Login} />}
+      />
+      <Route
+        path="/register"
+        component={() => <PublicRoute component={Register} />}
+      />
       <Route component={AuthenticatedRoutes} />
     </Switch>
   );
